@@ -1,92 +1,107 @@
-# 🧠 StackExchange Tag Prediction with RNN
+🧠 StackExchange Tag Prediction with RNN, LSTM & GRU
+Automatically predict relevant tags for a StackExchange question using the body of the question. This project explores deep learning models (RNN, LSTM, GRU) for multi-label text classification.
 
-Automatically predict relevant tags for a StackExchange question using the question's body text with a Recurrent Neural Network (RNN).
+📌 Problem Statement
+Build a machine learning model to predict appropriate tags for StackExchange questions using their content. This is a multi-label classification task where each question can have multiple tags.
 
----
+📂 Dataset
+Source: Kaggle - StackOverflow Stats Questions
 
-## 📌 Problem Statement
+Files Used: Questions.csv, Tags.csv
 
-Build a machine learning model to predict appropriate tags for StackExchange questions using their content. This multi-label classification problem helps categorize user questions effectively, enabling better content search and topic indexing.
+License: CC-BY-SA 3.0 (Attribution required)
 
----
+🧪 Approach
+🔹 1. Data Preparation
+Loaded both Questions.csv and Tags.csv.
 
-## 📂 Dataset
+Merged datasets on the Id field.
 
-- **Source:** [Kaggle - StackOverflow Stats Questions](https://www.kaggle.com/datasets/stackoverflow/statsquestions#Questions.csv)
-- **Files Used:** `Questions.csv`, `Tags.csv`
-- **License:** CC-BY-SA 3.0 (Attribution required)
+Cleaned the Body of each question using:
 
----
+BeautifulSoup for HTML removal
 
-## 🧪 Approach
+Lowercasing, special character filtering, stopword removal
 
-### 1. Data Preparation
+🔹 2. Tag Processing
+Selected top 10 most frequent tags.
 
-- Loaded and merged `Questions.csv` with `Tags.csv` on `Id`.
-- Cleaned the `Body` field using:
-  - HTML tag removal with BeautifulSoup
-  - Non-alphabetic character removal
-  - Lowercasing and whitespace normalization
+Filtered rows with at least 2 of those top 10 tags.
 
-### 2. Tag Processing
+Applied MultiLabelBinarizer to encode tags into a binary matrix.
 
-- Selected top 10 most frequent tags.
-- Filtered records containing at least 2 of these tags.
-- Used `MultiLabelBinarizer` to encode tags into a binary matrix.
+🔹 3. Text Preprocessing
+Tokenized and vectorized question body using Tokenizer from Keras.
 
-### 3. Text Vectorization
+Limited vocabulary size and applied padding to a max length (max_len=100).
 
-- Tokenized cleaned text using Keras' `Tokenizer`.
-- Limited vocabulary to words appearing more than 3 times.
-- Converted text into padded sequences of max length 100.
+🧠 Model Architectures
+Three deep learning models were implemented and compared:
 
-### 4. Model Architecture
+✅ RNN Model
+python
+Copy
+Edit
+Embedding -> SimpleRNN -> Dense -> Output(sigmoid)
+✅ LSTM Model
+python
+Copy
+Edit
+Embedding -> LSTM -> Dense -> Output(sigmoid)
+✅ GRU Model
+python
+Copy
+Edit
+Embedding -> GRU -> Dense -> Output(sigmoid)
+All models used binary_crossentropy loss and Adam optimizer.
 
-A Sequential Keras model with the following layers:
-- `Embedding` layer
-- `SimpleRNN` layer with 128 units
-- Fully connected `Dense` layer with ReLU
-- Output `Dense` layer with sigmoid activation (for multi-label classification)
+Models were trained with checkpointing on validation loss.
 
-### 5. Training
+📊 Evaluation Strategy
+Predicted tag probabilities for validation samples.
 
-- Used `binary_crossentropy` loss and `Adam` optimizer.
-- Trained for 10 epochs with checkpointing on validation loss.
+Tuned the classification threshold from 0.01 to 0.50.
 
-### 6. Prediction & Evaluation
+Chose the best threshold based on macro F1-score.
 
-- Predicted tag probabilities on validation data.
-- Converted probabilities to binary outputs using a threshold.
-- Optimized F1-score over a range of thresholds (0 to 0.5 in 0.01 steps).
-- Selected the best threshold based on macro F1-score.
+📈 Model Performance
+Model	Accuracy	Precision	Recall	F1 Score
+RNN	0.7940	0.84	0.79	0.81
+LSTM	0.8051	0.85	0.80	0.82
+GRU	0.8112	0.86	0.81	0.83
 
----
+✅ GRU yielded the best macro F1-score and general accuracy.
 
-## 🔧 Dependencies
+🔧 Dependencies
+Python 3.x
 
-- Python
-- Pandas, NumPy
-- BeautifulSoup
-- Scikit-learn
-- TensorFlow / Keras
-- Matplotlib
+Pandas, NumPy
 
----
+BeautifulSoup
 
-## 🧠 Key Metrics
+Scikit-learn
 
-   precision    recall  f1-score   support
+TensorFlow / Keras
 
-           0       0.91      0.82      0.86     17520
-           1       0.50      0.69      0.58      4700
+Matplotlib
 
-    accuracy                           0.79     22220
-   macro avg       0.71      0.75      0.72     22220
-weighted avg       0.82      0.79      0.80     22220
+🚀 How to Run
+Clone this repository:
 
-## 🚀 How to Run
+bash
+Copy
+Edit
+git clone https://github.com/<your-username>/StackExchange-Tag-Prediction-RNN.git
+cd StackExchange-Tag-Prediction-RNN
+Install dependencies:
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/<your-username>/StackExchange-Tag-Prediction-RNN.git
-   cd StackExchange-Tag-Prediction-RNN
+bash
+Copy
+Edit
+pip install -r requirements.txt
+Run the notebook:
+
+bash
+Copy
+Edit
+jupyter notebook Predict_Tags_With_RNN__LSTM_GRU.ipynb
