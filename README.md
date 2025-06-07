@@ -1,70 +1,92 @@
 # 🧠 StackExchange Tag Prediction with RNN
 
-Automatically predict relevant tags for a StackExchange question using its text content with a Recurrent Neural Network (RNN).
+Automatically predict relevant tags for a StackExchange question using the question's body text with a Recurrent Neural Network (RNN).
 
 ---
 
 ## 📌 Problem Statement
 
-The goal of this project is to build an NLP-based deep learning model to predict tags for a given StackExchange question using only its title and body text. This automation can improve content categorization and discoverability on community platforms like Stack Overflow.
+Build a machine learning model to predict appropriate tags for StackExchange questions using their content. This multi-label classification problem helps categorize user questions effectively, enabling better content search and topic indexing.
 
 ---
 
 ## 📂 Dataset
 
 - **Source:** [Kaggle - StackOverflow Stats Questions](https://www.kaggle.com/datasets/stackoverflow/statsquestions#Questions.csv)
+- **Files Used:** `Questions.csv`, `Tags.csv`
 - **License:** CC-BY-SA 3.0 (Attribution required)
-
-The dataset contains StackExchange questions related to statistics and includes:
-- `Id`
-- `Title`
-- `Body`
-- `Tags`
-- `CreationDate`, etc.
 
 ---
 
 ## 🧪 Approach
 
-1. **Data Cleaning & Preprocessing**
-   - HTML tag removal
-   - Stopword removal
-   - Lemmatization
+### 1. Data Preparation
 
-2. **Text Tokenization**
-   - Tokenized question titles and bodies
-   - Padded sequences for input to RNN
+- Loaded and merged `Questions.csv` with `Tags.csv` on `Id`.
+- Cleaned the `Body` field using:
+  - HTML tag removal with BeautifulSoup
+  - Non-alphabetic character removal
+  - Lowercasing and whitespace normalization
 
-3. **Model Architecture**
-   - Embedding Layer
-   - Bidirectional LSTM
-   - Dense layers with sigmoid activation for multi-label classification
+### 2. Tag Processing
 
-4. **Evaluation Metrics**
-   - Precision, Recall, F1-Score
-   - Custom threshold optimization for tag prediction
+- Selected top 10 most frequent tags.
+- Filtered records containing at least 2 of these tags.
+- Used `MultiLabelBinarizer` to encode tags into a binary matrix.
+
+### 3. Text Vectorization
+
+- Tokenized cleaned text using Keras' `Tokenizer`.
+- Limited vocabulary to words appearing more than 3 times.
+- Converted text into padded sequences of max length 100.
+
+### 4. Model Architecture
+
+A Sequential Keras model with the following layers:
+- `Embedding` layer
+- `SimpleRNN` layer with 128 units
+- Fully connected `Dense` layer with ReLU
+- Output `Dense` layer with sigmoid activation (for multi-label classification)
+
+### 5. Training
+
+- Used `binary_crossentropy` loss and `Adam` optimizer.
+- Trained for 10 epochs with checkpointing on validation loss.
+
+### 6. Prediction & Evaluation
+
+- Predicted tag probabilities on validation data.
+- Converted probabilities to binary outputs using a threshold.
+- Optimized F1-score over a range of thresholds (0 to 0.5 in 0.01 steps).
+- Selected the best threshold based on macro F1-score.
 
 ---
 
-## 📊 Performance
-
-The model is evaluated using macro/micro F1-score on a held-out validation set. Multi-label classification threshold tuning was applied for optimal performance.
-
----
-
-## 🧠 Technologies Used
+## 🔧 Dependencies
 
 - Python
-- TensorFlow / Keras
-- Numpy, Pandas
+- Pandas, NumPy
+- BeautifulSoup
 - Scikit-learn
-- NLTK / BeautifulSoup (for preprocessing)
+- TensorFlow / Keras
+- Matplotlib
 
 ---
 
-## 🚀 Running the Project
+## 🧠 Key Metrics
 
-1. Clone the repository:
+   precision    recall  f1-score   support
+
+           0       0.91      0.82      0.86     17520
+           1       0.50      0.69      0.58      4700
+
+    accuracy                           0.79     22220
+   macro avg       0.71      0.75      0.72     22220
+weighted avg       0.82      0.79      0.80     22220
+
+## 🚀 How to Run
+
+1. Clone this repository:
    ```bash
    git clone https://github.com/<your-username>/StackExchange-Tag-Prediction-RNN.git
    cd StackExchange-Tag-Prediction-RNN
